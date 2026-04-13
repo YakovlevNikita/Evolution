@@ -19,13 +19,14 @@
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
+    "baseUrl": ".",
     "paths": {
-      "@core/*": ["src/core/*"],
-      "@modules/*": ["src/modules/*"],
-      "@ui/*": ["src/ui/*"],
-      "@scenes/*": ["src/scenes/*"],
-      "@sdk/*": ["src/sdk/*"],
-      "@assets/*": ["src/assets/*"]
+      "@core/*": ["./src/core/*"],
+      "@modules/*": ["./src/modules/*"],
+      "@ui/*": ["./src/ui/*"],
+      "@scenes/*": ["./src/scenes/*"],
+      "@sdk/*": ["./src/sdk/*"],
+      "@assets/*": ["./src/assets/*"]
     }
   },
   "include": ["src/**/*"],

@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import type { GameState, GameEventMap, SerializableGameState } from '@core/types';
+import type { GameState, SerializableGameState } from '@core/types';
 import { SAVE_INTERVAL, MIN_SCORE_FLOOR } from '@core/config';
 
 /**

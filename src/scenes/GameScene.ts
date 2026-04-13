@@ -1,17 +1,23 @@
 import Phaser from 'phaser';
+import { StateManager } from '@core/StateManager';
+import { CLICK_BASE_INCOME, CLICK_INCOME_PER_LEVEL } from '@core/config';
 
 /**
- * Главная игровая сцена — клик по камню, отображение очков, кнопка магазина
- * Placeholder для Фазы 1
+ * Главная игровая сцена — клик по камню, очки, магазин
  */
 export class GameScene extends Phaser.Scene {
-  private score: number = 0;
+  private stateManager!: StateManager;
   private scoreText?: Phaser.GameObjects.Text;
   private pebble?: Phaser.GameObjects.Container;
   private shopButton?: Phaser.GameObjects.Text;
 
   constructor() {
     super({ key: 'GameScene' });
+  }
+
+  init(): void {
+    this.stateManager = StateManager.getInstance();
+    this.stateManager.startAutoSave();
   }
 
   create(): void {
@@ -39,15 +45,21 @@ export class GameScene extends Phaser.Scene {
       this.handlePebbleClick();
     });
 
-    // Счетчик очков
-    this.scoreText = this.add.text(width / 2, 60, 'Очки: 0', {
+    // Счетчик очков — подписка на StateManager
+    this.scoreText = this.add.text(width / 2, 60, '', {
       fontSize: '36px',
       fontFamily: 'Arial, sans-serif',
       color: '#e0e0e0',
     }).setOrigin(0.5);
+    this.updateScoreDisplay();
+
+    // Подписка на изменения счёта
+    this.stateManager.on('score:changed', () => {
+      this.updateScoreDisplay();
+    });
 
     // Кнопка магазина
-    this.shopButton = this.add.text(width - 120, 60, '🛒 Магазин', {
+    this.shopButton = this.add.text(width - 120, 60, 'Магазин', {
       fontSize: '18px',
       fontFamily: 'Arial, sans-serif',
       color: '#4ecca3',
@@ -67,7 +79,7 @@ export class GameScene extends Phaser.Scene {
       });
 
     // Debug: информация
-    this.add.text(20, height - 30, 'Фаза 0 — Прототип', {
+    this.add.text(20, height - 30, 'Фаза 1 — Ядро', {
       fontSize: '14px',
       fontFamily: 'Arial, sans-serif',
       color: '#555555',
@@ -75,11 +87,19 @@ export class GameScene extends Phaser.Scene {
   }
 
   /**
+   * Расчёт дохода за клик: 1 + clickLevel × 2
+   */
+  private getClickIncome(): number {
+    const level = this.stateManager.getClickLevel();
+    return CLICK_BASE_INCOME + level * CLICK_INCOME_PER_LEVEL;
+  }
+
+  /**
    * Обработка клика по камню
    */
   private handlePebbleClick(): void {
-    this.score += 1;
-    this.updateScoreDisplay();
+    const income = this.getClickIncome();
+    this.stateManager.addScore(income);
 
     // Анимация пружинки
     if (this.pebble) {
@@ -93,8 +113,11 @@ export class GameScene extends Phaser.Scene {
       });
     }
 
-    // Floating text "+1"
-    this.showFloatingText('+1', this.input.activePointer?.x ?? 0, this.input.activePointer?.y ?? 0);
+    // Floating text
+    const pointer = this.input.activePointer;
+    if (pointer) {
+      this.showFloatingText(`+${income}`, pointer.x, pointer.y);
+    }
   }
 
   /**
@@ -102,7 +125,7 @@ export class GameScene extends Phaser.Scene {
    */
   private updateScoreDisplay(): void {
     if (this.scoreText) {
-      this.scoreText.setText(`Очки: ${this.formatNumber(this.score)}`);
+      this.scoreText.setText(`Очки: ${this.formatNumber(this.stateManager.getScore())}`);
 
       // Pulse анимация
       this.tweens.add({

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, SCALE_MODE } from '@core/config';
+import { GAME_WIDTH, GAME_HEIGHT } from '@core/config';
 import { BootScene } from '@scenes/BootScene';
 import { GameScene } from '@scenes/GameScene';
 import { ShopScene } from '@scenes/ShopScene';
@@ -14,7 +14,7 @@ const config: Phaser.Types.Core.GameConfig = {
   parent: 'game-container',
   backgroundColor: '#1a1a2e',
   scale: {
-    mode: SCALE_MODE as Phaser.Scale.ScaleModeType,
+    mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     min: {
       width: 360,
